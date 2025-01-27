@@ -4,6 +4,7 @@ using atFrameWork2.PageObjects;
 using atFrameWork2.SeleniumFramework;
 using atFrameWork2.TestEntities;
 using ATframework3demo.BaseFramework.BitrixCPinterraction;
+using ATframework3demo.TestEntities;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace atFrameWork2.TestCases
                 new TestCase("Создание задачи", homePage => CreateTask(homePage)),
                 new TestCase("Редактирование задачи", (PortalHomePage homePage) => throw new NotImplementedException("Заглушка теста редактирования задачи")),
                 new TestCase("Удаление задачи", (PortalHomePage homePage) => { Thread.Sleep(5000); Log.Error("kukus"); }),
+                new TestCase("Смена пользователей в задачах",homePage => CreateTask(homePage)),
             };
         }
 
@@ -74,6 +76,35 @@ namespace atFrameWork2.TestCases
             var taskDescriptionArea = new WebItem($"//div[@id='task-detail-description']",
                 "Область описания задачи");
             taskDescriptionArea.AssertTextContains(task.Description, "Название задачи отображается неверно");
+        }
+        public static void ChangeTasksUsers(PortalHomePage homePage)
+        {
+            //подготовка среды (создание задачи)
+            //создаем нового сотрудника, которого будет делать новым исполнителем
+            var intranetUser = TestCase.RunningTestCase.CreatePortalTestUser(false);
+            var action = new TasksAction("Сменить пользователя");
+
+            //перейти в задачи
+            homePage
+                .LeftMenu
+                .OpenTasks()
+
+            //выбрать все задачи
+                .ChooseAllTasks()
+            //выбрать групповое действие сменить исполнителя
+                .GroupAction(action)
+            //выбрать добавленного пользователя
+                .OpenFinderBox()
+                .ChooseExecutor(intranetUser)
+                .CloseFinderBox()
+            //применить изменения
+                .ApplyChangeTasks()
+
+                //проверить что новый пользователь указан как испонитель
+                .AssertChangeExecutor(intranetUser);
+                
+
+
         }
     }
 }
