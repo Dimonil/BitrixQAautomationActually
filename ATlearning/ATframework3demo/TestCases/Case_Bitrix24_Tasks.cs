@@ -1,4 +1,5 @@
-﻿using atFrameWork2.BaseFramework;
+﻿using Appium.Interfaces.Generic.SearchContext;
+using atFrameWork2.BaseFramework;
 using atFrameWork2.BaseFramework.LogTools;
 using atFrameWork2.PageObjects;
 using atFrameWork2.SeleniumFramework;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
+
 namespace atFrameWork2.TestCases
 {
     public class Case_Bitrix24_Tasks : CaseCollectionBuilder
@@ -22,7 +24,7 @@ namespace atFrameWork2.TestCases
                 new TestCase("Создание задачи", homePage => CreateTask(homePage)),
                 new TestCase("Редактирование задачи", (PortalHomePage homePage) => throw new NotImplementedException("Заглушка теста редактирования задачи")),
                 new TestCase("Удаление задачи", (PortalHomePage homePage) => { Thread.Sleep(5000); Log.Error("kukus"); }),
-                new TestCase("Смена пользователей в задачах",homePage => CreateTask(homePage)),
+                new TestCase("Смена пользователей в задачах",homePage => ChangeTasksUsers(homePage)),
             };
         }
 
@@ -31,6 +33,7 @@ namespace atFrameWork2.TestCases
             //пример использования апишки c инвайтом юзеров и использованием второго драйвера
             var intranetUser = TestCase.RunningTestCase.CreatePortalTestUser(false);
             var extranetUser = TestCase.RunningTestCase.CreatePortalTestUser(true);
+        
             foreach (var user in new[] { intranetUser, extranetUser })
             {
                 var driver2 = WebDriverActions.GetNewDriver();
@@ -77,34 +80,38 @@ namespace atFrameWork2.TestCases
                 "Область описания задачи");
             taskDescriptionArea.AssertTextContains(task.Description, "Название задачи отображается неверно");
         }
-        public static void ChangeTasksUsers(PortalHomePage homePage)
+        private void ChangeTasksUsers(PortalHomePage homePage)
+
         {
             //подготовка среды (создание задачи)
             //создаем нового сотрудника, которого будет делать новым исполнителем
-            var intranetUser = TestCase.RunningTestCase.CreatePortalTestUser(false);
+            //var testUser = TestCase.RunningTestCase.CreatePortalTestUser(false); - падает на этой строчке . Руками создаю пользователя и тд      
+      
             var action = new TasksAction("Сменить пользователя");
+            User testUser = new User("Алексей","Петров");
 
-            //перейти в задачи
-            homePage
-                .LeftMenu
-                .OpenTasks()
+            bool assertLog =
+                //перейти в задачи
+                homePage
+                    .LeftMenu
+                    .OpenTasks()
 
-            //выбрать все задачи
-                .ChooseAllTasks()
-            //выбрать групповое действие сменить исполнителя
-                .GroupAction(action)
-            //выбрать добавленного пользователя
-                .OpenFinderBox()
-                .ChooseExecutor(intranetUser)
-                .CloseFinderBox()
-            //применить изменения
-                .ApplyChangeTasks()
+                    //выбрать все задачи
+                    .ChooseAllTasks()
+                    ////выбрать групповое действие сменить исполнителя
+                    .GroupAction(action)
+                    ////выбрать добавленного пользователя
+                    .OpenFinderBox()
+                    .ChooseUser(testUser)
+                    ////применить изменения
+                    .ApplyChangeTasks()
+                    //проверить что новый пользователь указан как испонитель
+                    .AssertChangeExecutor(testUser);
 
-                //проверить что новый пользователь указан как испонитель
-                .AssertChangeExecutor(intranetUser);
-                
-
-
+            if (!assertLog)
+            {
+                Log.Error("Исполнитель в задачах не изменился");
+            }
         }
     }
 }

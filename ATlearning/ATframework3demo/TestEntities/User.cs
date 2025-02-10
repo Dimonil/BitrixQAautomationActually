@@ -8,6 +8,11 @@ namespace atFrameWork2.TestEntities
     public class User
     {
         public User() { }
+        public User(string name, string lastName)
+        { 
+            Name = name;
+            LastName = lastName;
+        }
 
         public User(string loginAkaEmail, string password, string name, string lastName)
         {

@@ -4,8 +4,9 @@
     {
         public TasksAction(string title) 
         { 
-            Title = title ?? throw new ArgumentNullException(nameof(title)); 
+            Title = title; 
         }
         public string Title { get; set; }
+
     }
 }
