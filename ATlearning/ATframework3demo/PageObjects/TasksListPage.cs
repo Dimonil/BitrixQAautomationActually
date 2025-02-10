@@ -1,9 +1,9 @@
 ﻿using atFrameWork2.SeleniumFramework;
 using atFrameWork2.TestEntities;
 using ATframework3demo.PageObjects;
-using ATframework3demo.TestEntities;
 using OpenQA.Selenium;
 using atFrameWork2.BaseFramework.LogTools;
+using atFrameWork2.BaseFramework;
 
 namespace atFrameWork2.PageObjects
 {
@@ -31,7 +31,7 @@ namespace atFrameWork2.PageObjects
             new WebItem("//input[@id='bx-dest-internal-input']",
                 "Поле для поиска сотрудника");
         WebItem resultUser =>
-            new WebItem("//div[text()='Алексей Петров (kavabanga@mail.ru)']",
+            new WebItem($"//div[contains(text(),'{TestCase.RunningTestCase.TestPortal.PortalAdmin.LoginAkaEmail}')]",
                 "Выбор конкретного юзера");
 
         WebItem buttonApplyChange =>
@@ -56,7 +56,7 @@ namespace atFrameWork2.PageObjects
 
             return new TasksListPage(); 
         }
-        public TasksListPage GroupAction(TasksAction action)
+        public TasksListPage GroupAction()
         {
             buttonGroupAction.Click();
             changeExecutor.Hover();
@@ -66,7 +66,6 @@ namespace atFrameWork2.PageObjects
         }
         public TasksListPage OpenFinderBox()
         {
-            //
             buttonSelectUser.Click();
             
             return new TasksListPage();
@@ -78,14 +77,13 @@ namespace atFrameWork2.PageObjects
             
             return new TasksListPage();
         }
-        public bool AssertChangeExecutor(User user)
-        {
-            
-            return checkExecutor.InnerText() == $"{user.Name} {user.LastName}";
+        public bool AssertChangeExecutor()
+        {     
+            return checkExecutor.InnerText() == "Дмитрий Смоленцев";
         }
-        public TasksListPage ChooseUser(User user)
+        public TasksListPage ChooseUser()
         {
-            fieldFindUser.SendKeys($"{user.Name} {user.LastName}");
+            fieldFindUser.SendKeys($"{TestCase.RunningTestCase.TestPortal.PortalAdmin.LoginAkaEmail}");
             resultUser.WaitElementDisplayed(5);
             resultUser.Click();
 

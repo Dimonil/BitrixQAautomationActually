@@ -1,11 +1,11 @@
 ﻿using Appium.Interfaces.Generic.SearchContext;
+using AquaTestFramework.CommonFramework.BitrixCPinteraction;
 using atFrameWork2.BaseFramework;
 using atFrameWork2.BaseFramework.LogTools;
 using atFrameWork2.PageObjects;
 using atFrameWork2.SeleniumFramework;
 using atFrameWork2.TestEntities;
 using ATframework3demo.BaseFramework.BitrixCPinterraction;
-using ATframework3demo.TestEntities;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -83,30 +83,27 @@ namespace atFrameWork2.TestCases
         private void ChangeTasksUsers(PortalHomePage homePage)
 
         {
-            //подготовка среды (создание задачи)
-            //создаем нового сотрудника, которого будет делать новым исполнителем
-            //var testUser = TestCase.RunningTestCase.CreatePortalTestUser(false); - падает на этой строчке . Руками создаю пользователя и тд      
-      
-            var action = new TasksAction("Сменить пользователя");
-            User testUser = new User("Алексей","Петров");
-
+                       
+            //создаю задачу с анонимным исполнителем
+            Bitrix24Task taskManager = new Bitrix24Task("new title");
+            taskManager.CreateTask();
+            
             bool assertLog =
                 //перейти в задачи
                 homePage
                     .LeftMenu
                     .OpenTasks()
-
                     //выбрать все задачи
                     .ChooseAllTasks()
                     ////выбрать групповое действие сменить исполнителя
-                    .GroupAction(action)
+                    .GroupAction()
                     ////выбрать добавленного пользователя
                     .OpenFinderBox()
-                    .ChooseUser(testUser)
+                    .ChooseUser()
                     ////применить изменения
                     .ApplyChangeTasks()
                     //проверить что новый пользователь указан как испонитель
-                    .AssertChangeExecutor(testUser);
+                    .AssertChangeExecutor();
 
             if (!assertLog)
             {
